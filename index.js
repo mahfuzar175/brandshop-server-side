@@ -27,6 +27,8 @@ async function run() {
     await client.connect();
 
     const productCollection = client.db('productDB').collection('product');
+    const cartCollection = client.db('cartDB').collection('cart');
+
 
     // read product
     app.get('/products', async(req, res) =>{
@@ -68,6 +70,29 @@ async function run() {
       }
       const result = await productCollection.updateOne(filter, product, options);
       res.send(result);
+    })
+
+
+    app.get('/cart', async(req, res) =>{
+      const cursor = cartCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+ 
+
+    app.post('/cart', async(req, res) =>{
+      const newProduct = req.body;
+      console.log(newProduct);
+      const result = await cartCollection.insertOne(newProduct);
+      res.send(result);
+    })
+
+
+    app.delete('/cart/:id', async(req, res) =>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await cartCollection.deleteOne(query)
+      res.send(result)
     })
 
 
